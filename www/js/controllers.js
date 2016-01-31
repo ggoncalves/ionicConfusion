@@ -212,9 +212,14 @@ angular.module('conFusion.controllers', [])
   });
 }])
 
-.controller('AboutController', ['$scope', 'corporateFactory', function($scope, corporateFactory) {
+.controller('AboutController', ['$scope', 'corporateFactory', 'baseURL', function($scope, corporateFactory, baseURL) {
 
-  $scope.leaders = corporateFactory.query();
+  $scope.baseURL = baseURL;
+  $scope.leaders = corporateFactory.query(
+    function(response) {
+      $scope.leaders = response;
+    }
+  );
   console.log($scope.leaders);
 
 }])
