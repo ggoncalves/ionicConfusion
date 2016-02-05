@@ -167,12 +167,19 @@ angular.module('conFusion.controllers', [])
   };
 }])
 
-.controller('DishDetailController', ['$scope', '$stateParams', 'menuFactory', 'baseURL', function($scope, $stateParams, menuFactory, baseURL) {
+.controller('DishDetailController', ['$scope', '$stateParams', 'menuFactory', 'baseURL', '$ionicPopover', 'favoriteFactory', '$ionicModal', function($scope, $stateParams, menuFactory, baseURL, $ionicPopover, favoriteFactory, $ionicModal) {
 
   $scope.baseURL = baseURL;
   $scope.dish = {};
   $scope.showDish = false;
   $scope.message = "Loading ...";
+
+  $scope.comment = {
+    rating: 5,
+    comment: "",
+    author: "",
+    date: ""
+  };
 
   $scope.dish = menuFactory.getDishes().get({
       id: parseInt($stateParams.id, 10)
@@ -187,6 +194,59 @@ angular.module('conFusion.controllers', [])
       }
     );
 
+  $ionicPopover.fromTemplateUrl('templates/dish-detail-popover.html', {
+    scope: $scope
+  }).then(function(popover) {
+    $scope.popover = popover;
+  });
+
+
+  $scope.openPopover = function($event) {
+    $scope.popover.show($event);
+  };
+  $scope.closePopover = function() {
+    $scope.popover.hide();
+  };
+
+  $scope.addFavorite = function() {
+    favoriteFactory.addToFavorites($scope.dish.id);
+    $scope.closePopover();
+  };
+
+  $ionicModal.fromTemplateUrl('templates/dish-comment.html', {
+    scope: $scope
+  }).then(function(modal) {
+    $scope.commentform = modal;
+  });
+
+  $scope.closeCommentForm = function() {
+    $scope.commentform.hide();
+  };
+
+  $scope.addComment = function() {
+    $scope.commentform.show();
+    $scope.closePopover();
+  };
+
+  $scope.doComment = function() {
+
+    $scope.comment.date = new Date().toISOString();
+    console.log($scope.comment);
+
+    $scope.dish.comments.push($scope.comment);
+    menuFactory.getDishes().update({
+      id: $scope.dish.id
+    }, $scope.dish);
+
+    $scope.comment = {
+      rating: 5,
+      comment: "",
+      author: "",
+      date: ""
+    };
+
+    $scope.commentform.hide();
+  }
 
 }])
 
