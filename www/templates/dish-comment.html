@@ -15,23 +15,15 @@
                 <option ng-repeat="n in [1,2,3,4,5]" value="{{n}}">{{n}}</option>
             </select>
         </label>
-        <!--li class="item item-toggle">
-        Smoking?
-        <label class="toggle toggle-assertive">
-           <input type="checkbox" ng-model="comment.smoking">
-            <div class="track">
-                <div class="handle">
-                </div>
-            </div>
-        </label>
-      </li-->
         <label class="item item-input">
           <span class="input-label">Your Name</span>
           <input type="text" ng-model="comment.author">
         </label>
         <label class="item item-input">
           <span class="input-label">Your Comment</span>
-          <input type="text" ng-model="comment.comment">
+          <textarea ng-model="comment.comment"></textarea>
+          <!-- FIXME: After testing, keep the line above and delete the line below. -->
+          <!-- <input type="text" ng-model="comment.comment"> -->
         </label>
         <label class="item">
           <button class="button button-block button-positive" type="submit">Submit</button>
