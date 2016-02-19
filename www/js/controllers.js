@@ -10,7 +10,7 @@ angular.module('conFusion.controllers', [])
   //});
 
   // Form data for the login modal
-  $scope.loginData = $localStorage.getObject('userinfo','{}');
+  $scope.loginData = $localStorage.getObject('userinfo', '{}');
   $scope.reservation = {};
 
   // Create the login modal that we will use later
@@ -33,7 +33,7 @@ angular.module('conFusion.controllers', [])
   // Perform the login action when the user submits the login form
   $scope.doLogin = function() {
     console.log('Doing login', $scope.loginData);
-    $localStorage.storeObject('userinfo',$scope.loginData);
+    $localStorage.storeObject('userinfo', $scope.loginData);
 
     // Simulate a login delay. Remove this and replace with your login
     // code if using a login system
@@ -71,45 +71,68 @@ angular.module('conFusion.controllers', [])
   };
 })
 
-.controller('MenuController', ['$scope', 'dishes', 'favoriteFactory', 'baseURL', '$ionicListDelegate', function($scope, dishes, favoriteFactory, baseURL, $ionicListDelegate) {
+.controller('MenuController', ['$scope', 'dishes', 'favoriteFactory', 'baseURL', '$ionicListDelegate', '$ionicPlatform', '$cordovaLocalNotification', '$cordovaToast',
+  function($scope, dishes, favoriteFactory, baseURL, $ionicListDelegate, $ionicPlatform, $cordovaLocalNotification, $cordovaToast) {
 
-  $scope.baseURL = baseURL;
-  $scope.tab = 1;
-  $scope.filtText = '';
-  $scope.showDetails = false;
-  $scope.showMenu = false;
-  $scope.message = "Loading ...";
+    $scope.baseURL = baseURL;
+    $scope.tab = 1;
+    $scope.filtText = '';
+    $scope.showDetails = false;
+    $scope.showMenu = false;
+    $scope.message = "Loading ...";
 
-  $scope.dishes = dishes;
+    $scope.dishes = dishes;
 
-  $scope.select = function(setTab) {
-    $scope.tab = setTab;
+    $scope.select = function(setTab) {
+      $scope.tab = setTab;
 
-    if (setTab === 2) {
-      $scope.filtText = "appetizer";
-    } else if (setTab === 3) {
-      $scope.filtText = "mains";
-    } else if (setTab === 4) {
-      $scope.filtText = "dessert";
-    } else {
-      $scope.filtText = "";
-    }
-  };
+      if (setTab === 2) {
+        $scope.filtText = "appetizer";
+      } else if (setTab === 3) {
+        $scope.filtText = "mains";
+      } else if (setTab === 4) {
+        $scope.filtText = "dessert";
+      } else {
+        $scope.filtText = "";
+      }
+    };
 
-  $scope.isSelected = function(checkTab) {
-    return ($scope.tab === checkTab);
-  };
+    $scope.isSelected = function(checkTab) {
+      return ($scope.tab === checkTab);
+    };
 
-  $scope.toggleDetails = function() {
-    $scope.showDetails = !$scope.showDetails;
-  };
+    $scope.toggleDetails = function() {
+      $scope.showDetails = !$scope.showDetails;
+    };
 
-  $scope.addFavorite = function(index) {
-    console.log("index is " + index);
-    favoriteFactory.addToFavorites(index);
-    $ionicListDelegate.closeOptionButtons();
-  };
-}])
+    $scope.addFavorite = function(index) {
+      console.log("index is " + index);
+      favoriteFactory.addToFavorites(index);
+      $ionicListDelegate.closeOptionButtons();
+
+      $ionicPlatform.ready(function() {
+        $cordovaLocalNotification.schedule({
+          id: 1,
+          title: "Added Favorite",
+          text: $scope.dishes[index].name
+        }).then(function() {
+            console.log('Added Favorite ' + $scope.dishes[index].name);
+          },
+          function() {
+            console.log('Failed to add Notification ');
+          });
+
+        $cordovaToast
+          .show('Added a Favorite ' + $scope.dishes[index].name, 'long', 'center')
+          .then(function(success) {
+            // success
+          }, function(error) {
+            // error
+          });
+      });
+    };
+  }
+])
 
 .controller('ContactController', ['$scope', function($scope) {
 
@@ -160,7 +183,7 @@ angular.module('conFusion.controllers', [])
   };
 }])
 
-.controller('DishDetailController', ['$scope', '$stateParams', 'dish', 'menuFactory', 'favoriteFactory', 'baseURL', '$ionicPopover', '$ionicModal', function ($scope, $stateParams, dish, menuFactory, favoriteFactory, baseURL, $ionicPopover, $ionicModal) {
+.controller('DishDetailController', ['$scope', '$stateParams', 'dish', 'menuFactory', 'favoriteFactory', 'baseURL', '$ionicPopover', '$ionicModal', function($scope, $stateParams, dish, menuFactory, favoriteFactory, baseURL, $ionicPopover, $ionicModal) {
 
   $scope.baseURL = baseURL;
   $scope.dish = {};
@@ -264,16 +287,16 @@ angular.module('conFusion.controllers', [])
 
 // implement the IndexController and About Controller here
 
-.controller('IndexController', ['$scope', 'leader', 'dish', 'promotion', 'baseURL', function ($scope, leader, dish, promotion, baseURL) {
+.controller('IndexController', ['$scope', 'leader', 'dish', 'promotion', 'baseURL', function($scope, leader, dish, promotion, baseURL) {
 
-    $scope.baseURL = baseURL;
-    $scope.showDish = false;
-    $scope.message = "Loading ...";
+  $scope.baseURL = baseURL;
+  $scope.showDish = false;
+  $scope.message = "Loading ...";
 
-    // Load values from resolve (app.js)
-    $scope.leader = leader;
-    $scope.dish = dish;
-    $scope.promotion = promotion;
+  // Load values from resolve (app.js)
+  $scope.leader = leader;
+  $scope.dish = dish;
+  $scope.promotion = promotion;
 
 }])
 
@@ -285,7 +308,7 @@ angular.module('conFusion.controllers', [])
 
 }])
 
-.controller('FavoritesController', ['$scope', 'dishes', 'favorites', 'favoriteFactory', 'baseURL', '$ionicListDelegate', '$ionicPopup', '$ionicLoading', '$timeout', function ($scope, dishes, favorites, favoriteFactory, baseURL, $ionicListDelegate, $ionicPopup, $ionicLoading, $timeout) {
+.controller('FavoritesController', ['$scope', 'dishes', 'favorites', 'favoriteFactory', 'baseURL', '$ionicListDelegate', '$ionicPopup', '$ionicLoading', '$timeout', function($scope, dishes, favorites, favoriteFactory, baseURL, $ionicListDelegate, $ionicPopup, $ionicLoading, $timeout) {
 
     $scope.baseURL = baseURL;
     $scope.shouldShowDelete = false;
